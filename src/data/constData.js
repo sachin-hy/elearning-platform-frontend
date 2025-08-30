@@ -1,0 +1,1 @@
+export const Instructor = "ROLE_INSTRUCTOR";
