@@ -52,6 +52,7 @@ function MessageRoom({roomId,email,roomName}){
       }
       catch(error)
       {
+         console.log("error in catch block of stompjs" + error);
          toast.error("Please Try Again After Some Time");
       }
      },[roomId]);
@@ -65,7 +66,8 @@ function MessageRoom({roomId,email,roomName}){
        setInputMessage("");
       }catch(error)
       {
-          toast.error("Please Try Again After Some Time");
+          console.log("error in sending message" + error)
+          toast.error("Please Try  Again After Some Time");
       } 
     }
  
