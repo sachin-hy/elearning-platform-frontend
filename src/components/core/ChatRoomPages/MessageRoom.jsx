@@ -35,7 +35,7 @@ function MessageRoom({roomId,email,roomName}){
         fetchMessage(roomId,token,setMessage,dispatch,navigate);
          setLoading(false);
        try{
-        const socket = new SockJS("http://localhost:8080/chat");
+        const socket = new SockJS("https://elearning-platform-backend-1.onrender.com/chat");
   
         console.log("socket connection request send");
         const client = Stomp.over(socket);
