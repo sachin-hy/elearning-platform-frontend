@@ -153,7 +153,7 @@ export function login(email, password,navigate)
         {
            const errorMessage = error.response.data.message;
            toast.error(errorMessage);
-           console.log("Login api error.......",error);
+           console.log("Login api error....... in the login in function",error);
     
         }
     }
