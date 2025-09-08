@@ -151,7 +151,8 @@ export function login(email, password,navigate)
         navigate("/dashboard/my-profile");
         }catch(error)
         {
-            toast.error(error.response.data);
+           const errorMessage = error.response.data.message;
+           toast.error(errorMessage);
            console.log("Login api error.......",error);
     
         }
@@ -193,7 +194,8 @@ export function forgotPassword(email,setEmailSent)
             toast.success("Password reset link sent to your email");
             setEmailSent(true);
         } catch (error) {
-            toast.error(error.response.data);
+           const errorMessage = error.response.data.message;
+           toast.error(errorMessage);
             console.log("Forgot Password API Error:", error);
             
         }
