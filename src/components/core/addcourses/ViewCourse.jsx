@@ -50,19 +50,16 @@ function ViewCourse() {
 };
 
 
-  console.log("review == ", review);
- 
 
-  console.log("courseEnrolled = ", studentCourses);
+
+  
   let selectedCourse =
     user.accountType === ACCOUNT_TYPE.INSTRUCTOR
       ? instructorCourses.find((item) => item.courseid === courseid)
       : studentCourses.find((item) => item.courseid === courseid);
 
   useEffect(() => {
-    // Restore course ID from localStorage if not set
-
-    
+ 
     if (!courseid) {
       const storedCourseId = localStorage.getItem("courseid");
       console.log("Stored course ID from localStorage:", storedCourseId);
@@ -71,7 +68,7 @@ function ViewCourse() {
       }
     }
 
-    // Restore course data from localStorage if not found in Redux
+   
     if (!selectedCourse) {
       const storedCourse = localStorage.getItem("viewedCourse");
       if (storedCourse) {
@@ -79,7 +76,6 @@ function ViewCourse() {
       }
     }
 
-    // Set course state and cache in localStorage
     if (selectedCourse) {
       setCourse(selectedCourse);
       localStorage.setItem("viewedCourse", JSON.stringify(selectedCourse));

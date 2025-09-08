@@ -34,8 +34,7 @@ function CreateSection() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          
-          
+     
           <label className="block text-sm font-medium text-gray-700 mb-1">Section Name</label>
           <input
             type="text"

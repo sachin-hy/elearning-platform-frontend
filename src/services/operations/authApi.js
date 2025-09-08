@@ -151,7 +151,7 @@ export function login(email, password,navigate)
         navigate("/dashboard/my-profile");
         }catch(error)
         {
-            toast.error("Password or email is incorrect");
+            toast.error(error.response.data);
            console.log("Login api error.......",error);
     
         }
@@ -173,6 +173,7 @@ export function logout(navigate)
             toast.success("Logout successful");
             
         } catch (error) {
+            toast.error("Error during logout. Please try again.");
             console.log("Logout API Error:", error);
         }
     };
@@ -192,6 +193,7 @@ export function forgotPassword(email,setEmailSent)
             toast.success("Password reset link sent to your email");
             setEmailSent(true);
         } catch (error) {
+            toast.error(error.response.data);
             console.log("Forgot Password API Error:", error);
             
         }
@@ -216,7 +218,7 @@ export function updatePassword(password,confirmPassword,token,navigate)
         }catch(error)
         {
             console.log("update Password API Error:", error);
-            toast.error("Link Expired!");
+            toast.error(error.response.data);
         }
     };
 }

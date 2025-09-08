@@ -38,7 +38,7 @@ function App() {
       <div className='w-full h-[10%] pb-4 pt-4'>
         <Navbar/>
       </div>
-        <ErrorBoundary>
+      <ErrorBoundary>
       <div className="w-full h-full overflow-auto">
        <Routes>
         
