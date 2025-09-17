@@ -48,15 +48,10 @@ export function updateProfile(formData,token,navigate)
                       dispatch(removeToken())
                       navigate("/login");
                     }
-                    
-                    console.log("Update Profile API Error:", error);
-             
-                    if (error.response && error.response.status === 401) {
-                        toast.error("Session expired. Please log in again.");
-                        dispatch(logout(navigate));
-                    } else {
-                        toast.error("Profile update failed. Please try again.");
+                    else{
+                        toast.error(error.response.data.message);
                     }
+                   
                 }
          }
     }

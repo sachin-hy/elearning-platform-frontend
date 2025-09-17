@@ -1,5 +1,7 @@
 
-const BASE_URL = "https://elearning-platform-backend-1.onrender.com";
+// const BASE_URL = "https://elearning-platform-backend-1.onrender.com";
+
+const BASE_URL = "http://localhost:8080";
 
 export const categories = {
     CATEGORIES_API:BASE_URL+"/course/showAllCategories",

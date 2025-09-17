@@ -65,15 +65,8 @@ export async function courseCreate(formData, navigate, dispatch, token, setCours
             navigate("/login");
         }
 
-        else if(error.status === 400)
-        {
-           toast.error(error.response.data);
-        }
-        else if(error.status === 500){
-           toast.error(error.response.data);
-
-        }else{
-          toast.error(error.response.data);
+        else{
+          toast.error(error.response.data.message);
         }
     }
 
@@ -102,13 +95,8 @@ export async function deleteCourse(courseid, navigate, dispatch, token) {
             dispatch(removeToken())
             navigate("/login");
         }
-        else if(error.status === 404)
-        {
-           toast.error(error.response.data);
-        }else if(error.status === 500){
-          toast.error(error.response.data);
-        }else{
-              toast.error(error.response.data);
+        else{
+              toast.error(error.response.data.message);
         }
         
         
@@ -142,7 +130,7 @@ export async function createSection(formData, navigate, token, setSectionid, dis
             dispatch(removeToken())
             navigate("/login");
         }else {
-           toast.error(error.response.data);
+           toast.error(error.response.data.message);
         }
         
     }
@@ -172,7 +160,7 @@ export async function deleteSection(sectionid, navigate, token, dispatch, course
             dispatch(removeToken())
             navigate("/login");
         }else{
-          toast.error(error.response.data);
+          toast.error(error.response.data.message);
         }     
     }
 }
@@ -187,6 +175,7 @@ export async function createSubsection(formData, navigate, token, dispatch, cour
             "Content-Type": "multipart/form-data",
         }, null);
 
+        console.log("result after subsection createion " , res);
         const sectionid = formData.sectionid;
         toast.success("Subsection created");
         dispatch(addSubSectionToInstructorCourses({
@@ -198,12 +187,20 @@ export async function createSubsection(formData, navigate, token, dispatch, cour
 
 
     } catch (error) {
-        if (error.status === 401) {
+       console.log("errror message in subsection catch block ", error);
+
+        if (error.response.message === 401) {
             toast.error("Your session has expired. Please log in again.");
             dispatch(removeToken())
             navigate("/login");
-        }else{
-          toast.error(error.response.data);
+        }
+       else if(error.code === 'ERR_NETWORK')
+        {
+            toast.error("Network Error: Upload File Less the 500MB");
+        }
+        else{
+            
+          toast.error(error.response.data.message);
         }
         
     }
@@ -236,7 +233,7 @@ export async function updateSubSection(formData, navigate, dispatch, token, cour
             navigate("/login");
         }
         else{
-            toast.error(error.response.data);
+            toast.error(error.response.data.message);
         }
         
     }
@@ -269,7 +266,7 @@ export async function deleteSubSection(courseid, sectionid, subSectionid, dispat
             dispatch(removeToken())
             navigate("/login");
         }else{
-            toast.error(error.response.data);
+            toast.error(error.response.data.message);
         }
         
     }
@@ -292,7 +289,7 @@ export async function fetchCourse(dispatch, type, pageNumber = 0) {
 
     } catch (error) {
          dispatch(setAllCourses([]));
-        toast.error(error.response.data);
+        toast.error(error.response.data.message);
     }
 
 }
@@ -318,7 +315,7 @@ export async function fetchCourseSize(type, dispatch, setCourseButton) {
 
     } catch (error) {
         setCourseButton([]);
-        toast.error(error.response.data);
+        toast.error(error.response.data.message);
     }
 
 }
@@ -369,7 +366,7 @@ export async function fetchUserCourses(token, user, dispatch, navigate) {
         }
         else{
              
-             toast.error(error.response.data);
+             toast.error(error.response.data.message);
         }
      
     }

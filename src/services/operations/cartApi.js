@@ -23,6 +23,7 @@ export  function fetchCartCourses(pageNumber,token,navigate)
                                  dispatch(removeToken())
                                  navigate("/login");
                        }
+                       toast.error(error.response.data.message);
             console.log("Error while loading cart courses" , error);
          }
     }
@@ -53,7 +54,8 @@ export function fetchCartCoursesSize(setCourseButton,token,navigate)
                                   dispatch(removeToken())
                                   navigate("/login");
                         }
-            console.log("Errorwhileloading cart course size", error);
+                        toast.error(error.response.data.message);
+             console.log("Errorwhileloading cart course size", error);
         }
     }
 }
@@ -78,7 +80,7 @@ export function addCartCourse(courseid, token,navigate) {
                                   dispatch(removeToken())
                                   navigate("/login");
                         }
-            toast.error(error.response.data);
+            toast.error(error.response.data.message);
             console.log("Error while adding course to cart", error);
         }
     }

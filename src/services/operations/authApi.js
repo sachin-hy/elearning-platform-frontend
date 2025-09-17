@@ -52,7 +52,7 @@ export function sendOtp(email,navigate)
                 toast.error("Your session has expired. Please log in again.");
                 navigate("/login");
             }
-            toast.error(error.response.data);
+            toast.error(error.response.data.message);
         } 
     }
 }
@@ -94,7 +94,7 @@ export function signup(
         }catch(error)
         {
             console.log("SIGNUP API ERROR............", error)
-            toast.error(error.response.data);
+            toast.error(error.response.data.message);
             navigate("/signup")
         }
     }
@@ -220,7 +220,7 @@ export function updatePassword(password,confirmPassword,token,navigate)
         }catch(error)
         {
             console.log("update Password API Error:", error);
-            toast.error(error.response.data);
+            toast.error(error.response.data.message);
         }
     };
 }

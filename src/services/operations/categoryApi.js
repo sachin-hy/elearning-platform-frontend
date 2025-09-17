@@ -48,7 +48,7 @@ export async function fetchTags(setCategories, token,navigate,dispatch) {
                       dispatch(removeToken())
                       navigate("/login");
             }else{
-              toast.error(error.response.data);
+              toast.error(error.response.data.message);
             }
      
       

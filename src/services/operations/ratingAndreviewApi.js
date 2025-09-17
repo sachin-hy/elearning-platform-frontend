@@ -38,8 +38,8 @@ export async function createReview({
                       dispatch(removeToken())
                       navigate("/login");
      }
-    console.error("Review submission failed:", error.response.data);
-    const errorMsg = error.response.data || "Failed to submit review";
+    console.error("Review submission failed:", error.response.data.message);
+    const errorMsg = error.response.data.message || "Failed to submit review";
     toast.error(errorMsg);
     if (onError) onError(error);
     throw error;  

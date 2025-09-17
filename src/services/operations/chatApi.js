@@ -29,8 +29,8 @@ export  async function fetchMessage(roomId,token,setMessage,dispatch,navigate)
                       dispatch(removeToken())
                       navigate("/login");
             }else{
-            console.log(error.response.data);
-              toast.error(error.response.data);
+            console.log(error.response.data.message);
+              toast.error(error.response.data.message);
           }
      }      
 }
@@ -51,6 +51,7 @@ export   function fetchRooms(token)
      }
      catch(error)
      {
+       toast.error(error.response.data.message);
        console.log(error);
      }
     }
