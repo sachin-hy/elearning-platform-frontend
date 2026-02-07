@@ -16,7 +16,7 @@ function MyCourses() {
   const {token} = useSelector((state) => state.auth)
   
  
-  const {courses,setCourses, setCourseid } = useCourseContext()
+  const {courses,setCourses } = useCourseContext()
   const navigate = useNavigate()
   const [loading,setLoading] = useState(false);
 
@@ -63,7 +63,7 @@ function MyCourses() {
 
     loadCourses();
     
-  },[]);
+  },[courses,token,user.accountType]);
 
 
   

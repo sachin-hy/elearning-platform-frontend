@@ -15,13 +15,12 @@ function AllCoursesHomePage() {
   
   const {token} = useSelector((state) => state.auth);
   const {type} = useParams();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  
   // current page number
   // it is used to change the page number when user clicks on the page number button
   const [pageNumber,setPageNumber] = useState(0);
   //to represent the total buttons 
-  const [courseButton,setCourseButton] = useState([0]);
+  const [courseButton,setCourseButton] = useState([]);
  
   const [loading,setLoading] = useState(false);
  
@@ -45,6 +44,8 @@ function AllCoursesHomePage() {
         }
 
         const totalCourses = result.data;
+
+        console.log("total courses = " + totalCourses);
         const totalPages = Math.ceil(totalCourses / 2);
 
         let buttons = [];

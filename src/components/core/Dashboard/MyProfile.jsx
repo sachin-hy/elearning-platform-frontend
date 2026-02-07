@@ -43,7 +43,7 @@ function MyProfile() {
               <div className="p-8 text-center">
                 <div className="relative inline-block">
                   <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-semibold shadow-lg">
-                      <img className=" rounded-full" src={user.image}/>
+                      <img className=" rounded-full" alt="image" src={user.image}/>
                    </div>
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center">
                     

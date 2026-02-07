@@ -84,7 +84,7 @@ useEffect(() => {
     console.log("Disconnecting old room:", roomId);
     client.disconnect();
   };
-}, [roomId]);
+}, [roomId,token]);
 
 
 
@@ -110,7 +110,7 @@ useEffect(() => {
          <div className="flex flex-col h-full w-full bg-gray-900 text-gray-200 font-sans">
             {/* div to show roomname */}
              <div className="flex items-center p-3 border-b border-gray-700 shadow-md  bg-gray-800">
-                <img src={ 'https://placehold.co/100x100/64748b/FFFFFF?text=R'}  className="h-10 w-10 rounded-full object-cover mr-4 bg-gray-600"/>
+                <img src={ 'https://placehold.co/100x100/64748b/FFFFFF?text=R'} alt="Room avatar" className="h-10 w-10 rounded-full object-cover mr-4 bg-gray-600"/>
                 <h1 className="text-lg font-semibold text-white">{roomName || "Chat Room"}</h1>
             </div>
 

@@ -1,5 +1,5 @@
 import { apiConnector } from "../apiconnector";
-import toast from "react-hot-toast";
+
 import { chatEndpoints } from "../apis";
 
 // it is called from messageroom component
