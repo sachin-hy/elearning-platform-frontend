@@ -63,7 +63,7 @@ function MyCourses() {
 
     loadCourses();
     
-  },[courses,token,user.accountType]);
+  },[]);
 
 
   
