@@ -9,7 +9,7 @@ import LearningSection from "../components/core/HomePage/LearningSection";
 import InstructorSection from "../components/core/HomePage/InstructorSection";
 import Footer from "../components/core/HomePage/common/Footer";
 import ExploreMore from "../components/core/HomePage/ExploreMore";
-import Sidebar from "../components/core/Dashboard/Sidebar";
+
 
 
 function Home()

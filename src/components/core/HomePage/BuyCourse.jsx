@@ -3,8 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useEffect, useState } from "react";
 import Footer from "../HomePage/common/Footer";
 import CardRating from "../ratingandreview/CardRating";
-import { useSelector } from "react-redux";
-import { getCourseDetails } from "../../../services/operations/courseApi";
+
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { fetchCourseFun } from "../../../services/operations/courseApi";

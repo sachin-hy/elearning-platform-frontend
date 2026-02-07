@@ -1,12 +1,11 @@
-import { useSelect } from "@material-tailwind/react";
-import { useDispatch, useSelector } from "react-redux";
+
+import {  useSelector } from "react-redux";
 import Message from "./Message";
 import { FaPaperPlane } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import {fetchMessage} from "../../../services/operations/chatApi"
 import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 

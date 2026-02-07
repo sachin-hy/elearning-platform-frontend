@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
@@ -25,7 +24,7 @@ import ViewCourse from "./components/core/addcourses/ViewCourse";
 import AllCoursesHomePage from "./components/core/HomePage/AllCoursesHomePage";
 import BuyCourse from "./components/core/HomePage/BuyCourse";
 import ErrorBoundary from "./error/ErrorBoundary";
-import Footer from "./components/core/HomePage/common/Footer";
+
 import ChatRoom from "./components/core/ChatRoomPages/ChatRoom";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";

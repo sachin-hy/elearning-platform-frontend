@@ -3,13 +3,7 @@ import toast from "react-hot-toast";
 import { chatEndpoints } from "../apis";
 
 // it is called from messageroom component
-export async function fetchMessage(
-  roomId,
-  token,
-  setMessage,
-  dispatch,
-  navigate,
-) {
+export async function fetchMessage(roomId, token, setMessage) {
   try {
     const res = await apiConnector(
       "GET",

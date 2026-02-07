@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { apiConnector } from "../apiconnector";
 import { categorysEndpoints } from "../apis";
 

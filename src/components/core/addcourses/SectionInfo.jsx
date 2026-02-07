@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react";
 
-import { Link, Navigate, useParams } from "react-router-dom";
-import toast from "react-hot-toast";
+
+import { useParams } from "react-router-dom";
+
 import ShowSection from "./ShowSection";
 
 import { useSelector } from "react-redux";
 import { useCourseContext } from "../../../providers/CourseProvider";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getCourseDetails } from "../../../services/operations/courseApi";
-import { useDispatch } from "react-redux";
+
 
 
 

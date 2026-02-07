@@ -1,15 +1,13 @@
-import { useCourseContext } from "../../../providers/CourseProvider";
-import { ACCOUNT_TYPE } from "../../../utils/constants";
+
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { ChevronUp } from 'lucide-react';
 import { ChevronDown } from 'lucide-react';
 import { Rating } from "@smastrom/react-rating";
-import { ratingAndReviewEndpoints } from "../../../services/apis";
-import { apiConnector } from "../../../services/apiconnector";
+
 import toast from "react-hot-toast";
 import { createReview } from "../../../services/operations/ratingAndreviewApi";
-import { useNavigate } from "react-router-dom";
+
 import { getCourseDetails } from "../../../services/operations/courseApi";
 import { useParams } from "react-router-dom";
 import { useMemo } from "react";

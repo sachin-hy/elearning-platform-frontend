@@ -3,7 +3,7 @@ import SubSection from "./SubSection";
 
 import { useCourseContext } from "../../../providers/CourseProvider";
 import { Plus } from 'lucide-react';
-import {  Pencil ,Trash2} from "lucide-react";
+import {Trash2} from "lucide-react";
 
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";

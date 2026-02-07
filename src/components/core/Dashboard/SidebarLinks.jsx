@@ -1,6 +1,6 @@
 
 import * as Icons from "react-icons/vsc";
-import { NavLink, matchPath, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 
 function SidebarLinks({link,iconName})
