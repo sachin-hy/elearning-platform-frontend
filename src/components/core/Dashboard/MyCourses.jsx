@@ -45,7 +45,6 @@ function MyCourses() {
   useEffect(() => {  
     
     const loadCourses = async () => {
-        // const result =  await dispatch(fetchUserCourses(token, user));
        
         setLoading(true);
 
