@@ -3,43 +3,80 @@ import { ACCOUNT_TYPE } from "../../../utils/constants"
 import { Pencil, Trash2, BookOpen, Clock, Users } from "lucide-react"
 import { useCourseContext } from "../../../providers/CourseProvider"
 import { useNavigate } from "react-router-dom"
-import { useEffect } from "react"
-import { useDispatch } from "react-redux"
-import { apiConnector } from "../../../services/apiconnector"
-import { coursesEndpoints } from "../../../services/apis"
-import { setTotalItems, setcoursesEnrolled } from "../../../slices/cartSlice"
-import toast from "react-hot-toast"
+import { useEffect, useState } from "react"
+import {toast} from "react-hot-toast"
 import {deleteCourse} from "../../../services/operations/courseApi"
 import { fetchUserCourses } from "../../../services/operations/courseApi"
+
+import { OrbitProgress } from "react-loading-indicators"
 
 
 function MyCourses() {
   const { user } = useSelector((state) => state.profile)
   const {token} = useSelector((state) => state.auth)
-  const { instructorCourses} = useSelector((state) => state.instructorCourses);
-  const { studentCourses } = useSelector((state) => state.studentCourses);
-  const { setCourseid } = useCourseContext()
+  
+ 
+  const {courses,setCourses, setCourseid } = useCourseContext()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const [loading,setLoading] = useState(false);
 
-   
-
+  
     const onDeleteClickHandler = async(courseid) =>
     {
-       await deleteCourse(courseid,navigate,dispatch,token);
+          
+        const result = await deleteCourse(courseid, token);
+
+        if(!result.success)
+        {
+          toast.error("Error while Deleting Course");
+          return;
+        }
+
+       
+        setCourses((prev) => {
+           return prev.filter((c) => Number(c.courseid) !== Number(courseid));
+        });
+
+         toast.success("Course Deleted successfully");
+     
     }
 
 
   useEffect(() => {  
     
-     fetchUserCourses(token,user,dispatch,navigate);
-  },[])
+    const loadCourses = async () => {
+        // const result =  await dispatch(fetchUserCourses(token, user));
+       
+        setLoading(true);
+
+        const result =  await fetchUserCourses(token, user.accountType);
+        if(!result.success)
+        {
+          toast.error("Error while fetching courses");
+          setLoading(false);
+          return;
+        }
+
+        setCourses(result.data);
+        setLoading(false);
+    }
+
+    loadCourses();
+    
+  },[]);
 
 
-  console.log("MyCourses component rendered with user:", instructorCourses);
+  
   const isInstructor = user?.accountType === ACCOUNT_TYPE.INSTRUCTOR
-  const courseList = isInstructor ? (Array.isArray(instructorCourses) ? instructorCourses : []) : (Array.isArray(studentCourses) ? studentCourses : [])
+  const courseList = courses; // isInstructor ? instructorCourses : studentCourses;
    
+  if(loading)
+  {
+     return <div className="flex justify-center  items-center min-h-screen">
+         <OrbitProgress variant="dotted" color="#dee7de" size="medium" text="" textColor="" />
+      </div>
+  }
+  //if(courses)
   return (
     <div className="min-h-screen w-full bg-richblack-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -130,8 +167,8 @@ function MyCourses() {
                         <button
                           className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
                           onClick={() => {
-                            setCourseid(course.courseid)
-                            navigate("/dashboard/view-course")
+                            // setCourseid(course.courseid)
+                            navigate(`/dashboard/view-course/${course.courseid}`)
                           }}
                         >
                           {isInstructor ? "View Course" : "Continue Learning"}
@@ -143,8 +180,8 @@ function MyCourses() {
                               className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
                               title="Edit Course"
                               onClick={() => {
-                                setCourseid(course.courseid)
-                                navigate("/dashboard/sectioninfo")
+                                //setCourseid(course.courseid)
+                                navigate(`/dashboard/sectioninfo/${course.courseid}`)
                               }}
                             >
                               <Pencil className="w-5 h-5" />

@@ -3,9 +3,11 @@ import { useSelector } from "react-redux"
 import { Pencil, Mail, Phone, Calendar, Shield, Star } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
+
+
 function MyProfile() {
   const {user} = useSelector((state) => state.profile)
-  console.log("User = ", user)
+ 
   const navigate = useNavigate()
 
   return (

@@ -3,25 +3,24 @@
 import { useState } from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { categorysEndpoints } from "../../../services/apis"
-import { apiConnector } from "../../../services/apiconnector"
+
 import { useForm } from "react-hook-form"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { courseCreate } from "../../../services/operations/courseApi"
+
 import { useCourseContext } from "../../../providers/CourseProvider"
 import { fetchTags } from "../../../services/operations/categoryApi"
-
-
+import toast from "react-hot-toast";
+import { createCourse } from "../../../services/operations/courseApi"
 
 function CourseInfo() {
   const [categories, setCategories] = useState([])
   const [previewImage, setPreviewImage] = useState(null)
-  const dispatch = useDispatch();
+  
   const { token } = useSelector((state) => state.auth)
   const navigate = useNavigate()
  
-  const { courseid,setCourseid } = useCourseContext();  
+  const { setCourses } = useCourseContext();  
  
 
   const {
@@ -33,7 +32,18 @@ function CourseInfo() {
   
 
   useEffect(() => {
-    fetchTags(setCategories, token,navigate,dispatch)
+    const loadTags = async () => {
+           
+      const result = await fetchTags(setCategories, token);
+      if(!result.success)
+      {
+        toast.error("Failed to load categories: " + result.message);
+        return;
+      }
+    }
+
+    loadTags();
+    
   }, [])
 
 
@@ -54,7 +64,22 @@ function CourseInfo() {
       ...data,
       file: data.file[0],
     }
-    await courseCreate(formData, navigate, dispatch, token,setCourseid)
+  
+    const result = await createCourse(formData, token);
+
+    
+    if(!result.success)
+    {
+      toast.error("Failed to create course: " + result.message);
+      return;
+    }
+
+    setCourses( (prevCourses) => {
+        return [...prevCourses, result.data];
+    });
+
+    toast.success("Course Created Successfully");
+    navigate("/dashboard/sectioninfo");
   }
 
   return (

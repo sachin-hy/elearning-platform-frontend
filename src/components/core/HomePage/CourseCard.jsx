@@ -16,63 +16,71 @@ const CourseCard = ({ course ,buttonVariable, setIsVerifyingPayment}) => {
     const token = useSelector((state)=> state.auth.token);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
     const onClickHandler = ()=>
     {
-        localStorage.setItem("buycourse",JSON.stringify(course));
-        navigate(`/buy-course`);
+     
+        navigate(`/buy-course/${course.courseid}`);
     }
 
     const onCartCourseHandler  = async() => {
-         dispatch(addCartCourse(course.courseid,token,navigate));
-    }
+     
+        const result = await addCartCourse(course.courseid,token);
+        if(!result.success)
+        {
+           toast.error("Failed to add course to cart: " + result.message);
+           return;
+        }
+
+        toast.success("Course added to cart successfully");
+      }
+
+
 
     const onBuyCourseHandler = async() => {
       try{
-          
-          console.log("Buy Button is Clicked");
-          console.log("------------------------------------------------------------");
+        
           const orderResponse = await apiConnector("POST",paymentEndpoints.CREATE_ORDER_API,null,{
            Authorization: `Bearer ${token}`
-         
           },{
             courseid: course.courseid
           });
-          console.log("Order creation response:", orderResponse.data);
+
+          // order placed and get orderid and other details
           const { orderId, currency, amount, keyId } = orderResponse.data;
           
 
-           const options = {
+          const options = {
                 key: keyId,
                 amount: amount * 100,
                 currency: currency,
                 name: "My Awesome Store",
                 description: "Course Enrollment",
                 order_id: orderId,
+                // caled after the payment is successful
+                // and a webhook is triggered to verify the payment in backend as well  
                 handler: async function (response) {
-                    
-                    
-                    try {
-                         
+                    try {  
                         const verificationResponse = await apiConnector("POST",paymentEndpoints.VERIFY_PAYMENT_API, {
                             razorpayOrderId: response.razorpay_order_id,
                             razorpayPaymentId: response.razorpay_payment_id,
                             razorpaySignature: response.razorpay_signature,
                             
-                        },{
+                            },{
                            Authorization: `Bearer ${token}`
          
                           },null);
 
                         if (verificationResponse.data.success) {
-                            alert("Payment verified successfully!");
+                            toast.success("Payment verified successfully!");
                             setIsVerifyingPayment(false);
                             navigate("/dashboard/my-courses");
                         } else {
-                            alert("Payment verification failed: " + verificationResponse.data.message);
+                            toast.error("Payment verification failed: " + verificationResponse.data.message);
                         }
                     } catch (error) {
                         console.error("Error during payment verification:", error);
-                        alert("Payment verification failed due to an error.");
+                        toast.error("Payment verification failed due to an error.");
                     }
                 },
                 prefill: {
@@ -104,12 +112,8 @@ const CourseCard = ({ course ,buttonVariable, setIsVerifyingPayment}) => {
       }catch(error)
       {
          
-        if(error.response.status === 400)
-        {
-         
-          toast.error(error.response.data);
-        }
-        console.error("Error while buying course ====== ",error.response?.data);
+          console.error("Error  while  payment:", error);
+          toast.error("Error while processing payment. Please try again."); 
       }
     }
 
@@ -120,6 +124,10 @@ const CourseCard = ({ course ,buttonVariable, setIsVerifyingPayment}) => {
       buttonVariable ? 
       
       (
+        ///******** */
+        ///   this is the card which is 
+        //     shown on the buy button
+        ///******** */
         <div className="w-32 sm:w-48 md:w-64 bg-zinc-800  rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
         <div className="relative">
         <img
@@ -165,6 +173,10 @@ const CourseCard = ({ course ,buttonVariable, setIsVerifyingPayment}) => {
       :
       
       (
+
+        //// ***
+        //   this is the card we see on the page for allcourses 
+        // ****////
       <button onClick={onClickHandler} className="  z-40  duration-300">
       <div className="w-full bg-zinc-800 rounded-xl shadow-2xl hover:scale-105 transition-transform duration-300 overflow-hidden">
        <div className="relative">

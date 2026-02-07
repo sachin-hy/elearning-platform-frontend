@@ -1,20 +1,18 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { apiConnector } from "../../../services/apiconnector";
-import { setAllCourses } from "../../../slices/courseSlice";
-import { coursesEndpoints } from "../../../services/apis";
+
 import CourseCard from "./CourseCard";
-import { fetchCourse, fetchCourseSize } from "../../../services/operations/courseApi";
+import { fetchCourses, fetchCourseSize } from "../../../services/operations/courseApi";
 import { fetchCartCourses, fetchCartCoursesSize } from "../../../services/operations/cartApi";
-
-
+import toast from "react-hot-toast";
+import { OrbitProgress } from "react-loading-indicators";
 
 function AllCoursesHomePage() {
 
 
-  const {allCourses} = useSelector((state) => state.course);
-  const {cartCourses} = useSelector((state) => state.cart);
+  const [pageCourses, setPageCourses] = useState([]);
+  
   const {token} = useSelector((state) => state.auth);
   const {type} = useParams();
   const dispatch = useDispatch();
@@ -24,37 +22,112 @@ function AllCoursesHomePage() {
   const [pageNumber,setPageNumber] = useState(0);
   //to represent the total buttons 
   const [courseButton,setCourseButton] = useState([0]);
-
+ 
+  const [loading,setLoading] = useState(false);
  
  
  
 
   useEffect(()=>{
-      setPageNumber(0);
+
+    const loadCourseSize = async () => {
+      setLoading(true);
+      
       if(type !== "cart")
       {
-         fetchCourseSize(type,dispatch,setCourseButton);  
+        const result = await fetchCourseSize(type);  
+       
+        if(!result.success)
+        {
+            toast.error("Failed to load course size: " + result.message)
+            setLoading(false);
+            return;
+        }
+
+        const totalCourses = result.data;
+        const totalPages = Math.ceil(totalCourses / 2);
+
+        let buttons = [];
+        for (let i = 0; i < totalPages; i++) {
+          buttons.push(i);
+        }
+
+        setCourseButton(buttons);
+        
       }else{
-        dispatch(fetchCartCoursesSize(setCourseButton,token,navigate));
+         setLoading(true);
+        const result = await fetchCartCoursesSize(token);
+        
+        if(!result.success)
+        {
+           toast.error("Failed to load cart courses size: " + result.message)
+            setLoading(false);
+           return;
+        }
+
+        const totalCourses = result.data;
+        const totalPages = Math.ceil(totalCourses / 2);
+        let buttons = [];
+
+        for(let i = 0; i < totalPages; i++){
+           buttons.push(i);
+        }
+
+        setCourseButton(buttons);
+         
       }
+      setPageNumber(0);
+    }
+
+    loadCourseSize();
        
   },[type]);
 
 
+
+
   useEffect(() => {
+    
+    const loadCourse = async () => {
+      setLoading(true);
     if(type !== "cart")
     {
-       fetchCourse(dispatch,type,pageNumber);
-    }else{
-       dispatch(fetchCartCourses(pageNumber,token,navigate));
+        
+       const result = await fetchCourses(type,pageNumber);
+
+       if(!result.success)
+       {
+            toast.error("Failed to load courses: " + result.message);
+             setLoading(false);
+            return;
+       }
+       setPageCourses(result.data);
+       
+      }else{
+       
+       
+        const result = await fetchCartCourses(pageNumber,token);
+        if(!result.success)
+        {
+          toast.error("Failed to load cart courses: " + result.message);
+           setLoading(false);
+          return;
+        }
+        setPageCourses(result.data);
+         
     }
-     
+    setLoading(false);
+  }
+
+    loadCourse();
+    
   },[type,pageNumber]);
 
 
  
   
-   const courseList = type !== "cart" ? allCourses : cartCourses;
+   const courseList =pageCourses;
+   
 
    function handlePageChange(pageNum) {
     setPageNumber(pageNum);
@@ -78,7 +151,13 @@ function AllCoursesHomePage() {
           </div>
         </div>
       </div>
-
+     
+      { loading ? (
+          <div className="flex justify-center  items-center min-h-screen">
+            <OrbitProgress variant="dotted" color="#dee7de" size="medium" text="" textColor="" />
+          </div>
+    
+      ) : (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {courseList.length !== 0 ? 
         (
@@ -86,7 +165,7 @@ function AllCoursesHomePage() {
             {/* div to show the total course */}
             <div className="mb-8">
               <p className="text-gray-600 text-sm">
-                Showing <span className="font-semibold text-gray-900">{allCourses.length}</span> courses
+                Showing <span className="font-semibold text-gray-900">{courseList.length}</span> courses
               </p>
             </div>
 
@@ -159,6 +238,7 @@ function AllCoursesHomePage() {
           </div>
         )}
       </div>
+      )}
 
      
       <div className="bg-richblack-900 border-t mt-16">

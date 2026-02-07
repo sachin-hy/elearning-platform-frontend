@@ -4,6 +4,8 @@ import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {updatePassword} from "../services/operations/authApi"
 import { useParams } from 'react-router-dom'; 
+import toast from "react-hot-toast";
+
 
 function UpdatePassword()
 {
@@ -11,7 +13,7 @@ function UpdatePassword()
     const [password,setPassword] = useState("");
     const [confirmPassword,setConfirmPassword] = useState("");
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+   
     const {token} = useParams();
 
     const handleOnChange = (e) =>
@@ -27,11 +29,19 @@ function UpdatePassword()
      
     }
 
-    const handleOnSubmit = (e) =>
+    const handleOnSubmit = async (e) =>
     {
        e.preventDefault();
-       dispatch(updatePassword(password,confirmPassword,token,navigate));
-    }
+       const result = await updatePassword(password,confirmPassword,token);
+      
+       if(!result.success)
+       {
+         toast.error("Update Password Failed : " + result.message);
+         return;
+       }
+        toast.success("Password reset successfully");
+        navigate("/login");
+      }
 
 
     return (

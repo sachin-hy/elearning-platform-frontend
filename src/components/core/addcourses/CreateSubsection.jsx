@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { createSubsection } from "../../../services/operations/courseApi";
 import { useCourseContext } from "../../../providers/CourseProvider";
 import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+
 
 function CreateSubsection() {
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
-  const { sectionid,courseid } = useCourseContext();
+  const { setCourses, sectionid, courseid } = useCourseContext();
   const dispatch = useDispatch();
 
 
@@ -25,7 +27,40 @@ function CreateSubsection() {
       sectionid: sectionid,
     };
 
-    await createSubsection(formData, navigate, token,dispatch,courseid);
+    if(sectionid == null)
+    {
+       toast.error("Section id can not be null");
+       return;
+    }
+
+ 
+    const result = await createSubsection(formData, token);
+
+    if(!result.success)
+    {
+      toast.error("Failed to create subsection: " + result.message);
+      return;
+    }
+
+    setCourses( (prevCourses) => {
+        return prevCourses.map( (course) => {
+            if(Number(course.courseid) !== Number(courseid)) return course;
+
+            return{
+              ...course,
+              courseContent: (course.courseContent || []).map( ( section) =>{
+                  if(Number(section.id) !== Number(sectionid)) return section;
+
+                  return{
+                    ...section,
+                    subSection: [...(section.subSection || []), result.data]
+                  }
+              })
+            }
+        })
+    })
+    toast.success("Subsection Created Successfully");
+    navigate(`/dashboard/sectioninfo/${courseid}`);
   };
 
   return (

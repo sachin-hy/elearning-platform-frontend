@@ -8,8 +8,12 @@ import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { FaClockRotateLeft } from "react-icons/fa6";
+import toast from "react-hot-toast";
+
+
 
 const VerifyEmail=()=>{
+  
   const {loading,signupData}=useSelector((state)=>state.auth);
   const dispatch=useDispatch();
   const [otp,setOtp]=useState("");
@@ -22,7 +26,7 @@ const VerifyEmail=()=>{
     }
   });
 
-  const handleOnSubmit=(e)=>{
+  const handleOnSubmit= async (e)=>{
     e.preventDefault();
     const {
       accountType,
@@ -32,8 +36,20 @@ const VerifyEmail=()=>{
       password,
       confirmPassword,
     } = signupData;
-    dispatch(signup(accountType,firstName,lastName,email,password,confirmPassword,otp,navigate));
+   const result = await dispatch(signup(accountType,firstName,lastName,email,password,confirmPassword,otp,navigate));
+    
+   if(!result.success){
+      toast.error("Signup failed: " + result.message);
+      navigate("/signup");
+      return;
+    }
+
+     toast.success("Signup Successful");
+     navigate("/login");
+  
   }
+
+
   return (
     <div class="text-white flex items-center justify-center flex-col h-[calc(100vh-56px)]">
       

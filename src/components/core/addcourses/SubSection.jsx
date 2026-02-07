@@ -5,9 +5,11 @@ import { useSelector } from "react-redux";
 import { deleteSubSection } from "../../../services/operations/courseApi";
 import { useDispatch } from "react-redux";
 
+import toast from "react-hot-toast";
 
-function SubSection({ subSectionName, subSectionid }) {
-  const { courseid, sectionid,setSubSectionid } = useCourseContext();
+
+function SubSection({ subSectionName, subSectionid ,courseid, sectionid}) {
+  const { setCourses,setSubSectionid,setSectionid ,setCourseid } = useCourseContext();
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -16,12 +18,44 @@ function SubSection({ subSectionName, subSectionid }) {
 
 
   const onUpdateClickHandler = () => {
+    setSectionid(sectionid);
+    setCourseid(courseid);
     setSubSectionid(subSectionid);
     navigate("/dashboard/update-subsection");
   };
 
   const onDeleteClickHandler = async() => {
-    await deleteSubSection(courseid,sectionid,subSectionid,dispatch, navigate, token);
+  
+     const result = await deleteSubSection(subSectionid,token);
+   
+    if (!result.success) {
+      toast.error("Failed to delete subsection: " + result.message);
+      return;
+    }
+    
+   
+   
+    setCourses((prevCourses) =>
+      prevCourses.map((course) => {
+      if (Number(course.courseid) !== Number(courseid)) return course;
+
+       return {
+        ...course,
+         courseContent: (course.courseContent || []).map((section) => {
+           if (Number(section.id) !== Number(sectionid)) return section;
+
+           return {
+             ...section,
+               subSection: (section.subSection || []).filter(
+                (sub) => Number(sub.id) !== Number(subSectionid)
+              ),
+             };
+           }),
+         };
+       })
+     );
+     toast.success("Subsection Deleted Successfully");
+
   };
 
   return (

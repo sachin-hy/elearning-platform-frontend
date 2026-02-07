@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 
+import { BASE_URL } from "../../../services/apis";
+
 
 function MessageRoom({roomId,email,roomName}){
 
@@ -18,9 +20,9 @@ function MessageRoom({roomId,email,roomName}){
      const [message,setMessage] = useState([]);
      const [inputMessage,setInputMessage] = useState("");
      const {token} = useSelector((state) => state.auth);
-     const dispatch = useDispatch();
+    
      const [stompClient, setStompClient] = useState(null);
-     const navigate = useNavigate();
+   
      const [loading, setLoading] = useState(true);
 
 
@@ -30,40 +32,73 @@ function MessageRoom({roomId,email,roomName}){
      console.log("userid = " , user);
      
      
-     useEffect(()=>{
-       setLoading(true);
-        fetchMessage(roomId,token,setMessage,dispatch,navigate);
-         setLoading(false);
-       try{
-        const socket = new SockJS("https://elearning-platform-backend-1.onrender.com/chat");
+useEffect(() => {
+  if (!roomId || !token) return;
+
+  setMessage([]);
+  setLoading(true);
+
+  const loadMessage = async() => {
+     const result = await fetchMessage(roomId, token, setMessage);
+
+     if(!result.success)
+     {
+        toast.error("Error while loading Messages");
+       setLoading(false);
+        return;
+     }
+     setLoading(false);
+  }
+  loadMessage();
   
-        console.log("socket connection request send");
-        const client = Stomp.over(socket);
-        client.connect(
-          {},
-          () => { client.subscribe(`/topic/chatroom/${roomId}`,
-                  (msg) => { setMessage((prev) => [...prev, JSON.parse(msg.body)]);}
-                 )}
-        );
+  const socket = new SockJS(`${BASE_URL}/chat`);
+  const client = Stomp.over(socket);
 
-        setStompClient(client);
 
-        return () => client.disconnect();
-      }
-      catch(error)
-      {
-         console.log("error in catch block of stompjs" + error);
-         toast.error("Please Try Again After Some Time");
-      }
-     },[roomId]);
+  //syntex =>  client.connect(headers, onConnect, onError);
 
-    console.log("message alist for the room " , message);
+  client.connect(
+    {},
+    () => {
+      console.log("Connected to room:", roomId);
+
+      // syntex => client.subscribe(destination, callback)
+      //It runs only when the server sends a message to that topic.
+      // Subscribe = “start listening”
+      client.subscribe(`/topic/chatroom/${roomId}`, (msg) => {
+        setMessage((prev) => [...prev, JSON.parse(msg.body)]);
+      });
+    },
+    (error) => {
+      console.log("Connection error:", error);
+      toast.error("Connection Failed. Please Try Again Later.");
+    }
+  );
+
+  setStompClient(client);
+
+  //this is a clean up function which is send to react
+  // when the roomid chage then or component unmount in that case 
+  // react will run first this function and then 
+  // run the rerender
+  return () => {
+    console.log("Disconnecting old room:", roomId);
+    client.disconnect();
+  };
+}, [roomId]);
+
+
+
+
+
 
     const onClickHandler =() =>
     {
       try{
-       stompClient.send(`/app/chatroom/${roomId}`, {},JSON.stringify({content:inputMessage,roomId:roomId,email:email}));
-       setInputMessage("");
+      
+        stompClient.send(`/app/chatroom/${roomId}`, {},JSON.stringify({content:inputMessage,roomId:roomId,email:email}));
+        setInputMessage("");
+      
       }catch(error)
       {
           console.log("error in sending message" + error)
@@ -113,7 +148,7 @@ function MessageRoom({roomId,email,roomName}){
 
             {/* message input and button to send */}
 
-           <div class="flex h-[10%] items-center p-2 bg-gray-100 border-t border-gray-300">
+           <div className="flex h-[10%] items-center p-2 bg-gray-100 border-t border-gray-300">
   
 
           <input 

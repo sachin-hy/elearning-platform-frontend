@@ -10,18 +10,18 @@ import { apiConnector } from "../../../services/apiconnector";
 import toast from "react-hot-toast";
 import { createReview } from "../../../services/operations/ratingAndreviewApi";
 import { useNavigate } from "react-router-dom";
+import { getCourseDetails } from "../../../services/operations/courseApi";
+import { useParams } from "react-router-dom";
+import { useMemo } from "react";
+import { OrbitProgress } from "react-loading-indicators";
 
 
 function ViewCourse() {
-  const { instructorCourses} = useSelector((state) => state.instructorCourses);
-
-  const { studentCourses } = useSelector((state) => state.studentCourses);
-  const { user } = useSelector((state) => state.profile);
-  const { courseid, setCourseid } = useCourseContext();
+ 
+  const { courseid } = useParams();
+  
   const { token } = useSelector((state) => state.auth);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
+ 
   const [url, setUrl] = useState(null);
   const [course, setCourse] = useState(null);
   const [viewSection, setViewSection] = useState([]);
@@ -35,86 +35,63 @@ function ViewCourse() {
 
   const onSubmitHandler = async (e) => {
   e.preventDefault();
-  await createReview({
+  const result = await createReview({
     courseid,
     rating,
     review,
-    token,
-    navigate,
-    dispatch,
-    onSuccess: () => {
-      setRating(0);
-      setReview("");
-    }
+    token
   });
+  if (!result.success) 
+  {
+    toast.error("Failed to submit review: " + result.message);
+    return;
+  }
+  setRating(0);
+  setReview("");
+  toast.success("Review submitted successfully");
+  
 };
 
 
 
 
-  
-  let selectedCourse =
-    user.accountType === ACCOUNT_TYPE.INSTRUCTOR
-      ? instructorCourses.find((item) => item.courseid === courseid)
-      : studentCourses.find((item) => item.courseid === courseid);
+useEffect( () => {
+   
+     const loadCourse = async() =>{
+      
+       
+       const result = await getCourseDetails(courseid, token);
+       if (!result.success) {
+          toast.error("Failed to load course details: " + result.message);
+          
+          return;
+       } 
+       setCourse(result.data);
 
-  useEffect(() => {
+       setViewSection(
+         result.data.courseContent.map(() => false)
+       );
+       
+     }
+
+     loadCourse();
+
+    //  course?.courseContent?.forEach((section, index) =>{
+    //     setViewSection((prev) => {
+    //       const newViewSection = [...prev];
+    //       newViewSection[index] = false; 
+    //       return newViewSection;
+    //     });
+    // })
+
+  },[]);
+
  
-    if (!courseid) {
-      const storedCourseId = localStorage.getItem("courseid");
-      console.log("Stored course ID from localStorage:", storedCourseId);
-      if (storedCourseId) {
-        setCourseid(storedCourseId);
-      }
-    }
 
-   
-    if (!selectedCourse) {
-      const storedCourse = localStorage.getItem("viewedCourse");
-      if (storedCourse) {
-        selectedCourse = JSON.parse(storedCourse);
-      }
-    }
 
-    if (selectedCourse) {
-      setCourse(selectedCourse);
-      localStorage.setItem("viewedCourse", JSON.stringify(selectedCourse));
-    }
-
-    course?.courseContent?.forEach((section, index) =>{
-        setViewSection((prev) => {
-          const newViewSection = [...prev];
-          newViewSection[index] = false; 
-          return newViewSection;
-        });
-    })
-
-   
-  }, []);
-
-  console.log("view:", viewSection);
-
-  if (!course) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="text-xl text-white">Loading course...</div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full h-full">
-      <div className="flex flex-cols w-full h-full  ">
-        {/* Left: Course Sections */}
-        <div className="w-[45%] mt-4 mr-8 ml-4  overflow-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-white text-shadow-text-glow-light mb-6">
-            {course.courseName}
-          </h2>
-
-          <div className="space-y-4 p-8">
-            {course.courseContent?.map((section, index) => (
+  const sectionList = useMemo(() => {
+     if (!course) return null;
+    return course.courseContent?.map((section, index) => (
               <div key={index} className="bg-white rounded-lg shadow-sm border border-white p-2">
                 <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-normal text-shadow-text-glow-light text-gray-700 mb-3">
@@ -150,7 +127,34 @@ function ViewCourse() {
                   </ul>
                 )}
               </div>
-            ))}
+            ))
+  },[course?.courseContent, viewSection]);
+
+  
+
+
+  
+
+  console.log("view:", viewSection);
+
+  if(!course)
+  {
+     return <div className="flex justify-center  items-center min-h-screen">
+         <OrbitProgress variant="dotted" color="#dee7de" size="medium" text="" textColor="" />
+      </div>
+  }
+
+  return (
+    <div className="w-full h-full">
+      <div className="flex flex-cols w-full h-full  ">
+        {/* Left: Course Sections */}
+        <div className="w-[45%] mt-4 mr-8 ml-4  overflow-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-shadow-text-glow-light mb-6">
+            {course.courseName}
+          </h2>
+
+          <div className="space-y-4 p-8">
+              {sectionList}
           </div>
         </div>
 

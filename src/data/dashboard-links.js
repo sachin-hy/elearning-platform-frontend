@@ -45,6 +45,6 @@ export const sidebarLinks = [
     id: 7,
     name: "Chat",
     path: "/dashboard/chat",
-    icon: "VscComment" ,
-  }
+    icon: "VscComment",
+  },
 ];

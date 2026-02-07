@@ -1,32 +1,61 @@
 import { useSelector } from "react-redux";
 import SubSection from "./SubSection";
-import { Link, useAsyncError, useNavigate } from "react-router-dom";
+
 import { useCourseContext } from "../../../providers/CourseProvider";
 import { Plus } from 'lucide-react';
 import {  Pencil ,Trash2} from "lucide-react";
-import { GiNextButton } from "react-icons/gi";
+
 import toast from "react-hot-toast";
-import { sectionEndpoints } from "../../../services/apis";
-import { apiConnector } from "../../../services/apiconnector";
-import { useDispatch } from "react-redux";
-import { removeSectionFromTotalItems } from "../../../slices/cartSlice";
+import { useNavigate } from "react-router-dom";
 import { deleteSection } from "../../../services/operations/courseApi";
 
 
 function ShowSection({courseid, subSectionList, sectionName,sectionid }) {
     const navigate = useNavigate();
     const { token } = useSelector((state) => state.auth);
-    const { setSectionid } = useCourseContext();
+    const { setCourses, setSectionid ,setCourseid} = useCourseContext();
    
-    const dispatch = useDispatch();
 
-    const updateSectionHandler = () => {
-        setSectionid(sectionid);
-        navigate("/dashboard/update-section");
+    const onCreateSubsectionHandler = () =>{
+    
+         console.log("section id" + sectionid);
+         console.log("courseid = " + courseid);
+          setSectionid(sectionid);
+          setCourseid(courseid);
+          navigate("/dashboard/create-subsection");
+              
     }
 
     const deleteSectionHandler = async() => {
-         await deleteSection(sectionid, navigate, token, dispatch, courseid);
+       
+        if (sectionid == null) {
+          toast.error("Section id not available");
+          return;
+        }
+
+        const result = await deleteSection(sectionid, token, courseid)
+        if(!result.success)
+        {
+            toast.error("Failed to delete section: " + result.message);
+            return;
+        }
+        
+
+       setCourses((prevCourses) =>
+            prevCourses.map((course) => {
+           if (Number(course.courseid) !== Number(courseid)) return course;
+
+          return {
+          ...course,
+          courseContent: (course.courseContent || []).filter(
+            (section) => Number(section.id) !== Number(sectionid)
+          ),
+        };
+        })
+      );
+
+      toast.success("Section Deleted Successfully");
+       
     }
      
     return (
@@ -34,12 +63,7 @@ function ShowSection({courseid, subSectionList, sectionName,sectionid }) {
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">{sectionName}</h3>
                 <div className="flex gap-2">
-                   <button
-                     onClick={updateSectionHandler}
-                     className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors duration-300"
-                    >
-                    <Pencil className="h-4 w-4" />
-                   </button>
+                   
                    <button
                    onClick={deleteSectionHandler}
                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors duration-300"
@@ -56,7 +80,8 @@ function ShowSection({courseid, subSectionList, sectionName,sectionid }) {
           </div>
         ) : (
           <div className="space-y-2">
-            {subSectionList.map((subsection) => (
+            {
+            subSectionList.map((subsection) => (
               <SubSection
                 key={subsection.id}
                 subSectionName={subsection.title}
@@ -72,10 +97,7 @@ function ShowSection({courseid, subSectionList, sectionName,sectionid }) {
 
             <div className="mt-4 pt-4 border-t border-gray-200">
                 <button 
-                    onClick={() => {
-                        setSectionid(sectionid);
-                        navigate("/dashboard/create-subsection");
-                    }}
+                    onClick={onCreateSubsectionHandler}
                     className="inline-flex items-center px-4 py-2 bg-green-600 text-black rounded-md hover:bg-green-700 transition-colors duration-300 text-sm"
                 >
                     <Plus className="w-4 h-4"/> Create Subsection

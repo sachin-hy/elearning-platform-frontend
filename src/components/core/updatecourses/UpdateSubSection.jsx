@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useCourseContext } from "../../../providers/CourseProvider";
 import { updateSubSection } from "../../../services/operations/courseApi";
 import { useDispatch } from "react-redux";
-
+import toast from "react-hot-toast";
 
 function UpdateSubSection() {
   const {
@@ -15,7 +15,7 @@ function UpdateSubSection() {
 
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
-  const { courseid, sectionid, subsectionid} = useCourseContext();
+  const { courses, setCourses, courseid, sectionid, subsectionid} = useCourseContext();
   const dispatch = useDispatch();
 
 
@@ -25,10 +25,47 @@ function UpdateSubSection() {
     const formData = {
       ...data,
       vedioUrl: data.vedioUrl[0],
+      sectionid:sectionid,
       subsectionid:subsectionid, 
     };
 
-    await updateSubSection(formData, navigate,dispatch, token, courseid, sectionid, subsectionid);
+    const response = await updateSubSection(formData, token);
+    
+    if(!response.success)
+    {
+      toast.error("Failed to update subsection: " + response.message);
+      return;
+    }
+
+   
+
+    setCourses((prevCourses) => {
+        return prevCourses.map( (course) => {
+           if(Number(course.courseid) !== Number(courseid)) return course;
+
+           return {
+            ...course,
+            courseContent: (course.courseContent || []).map( (section) =>
+            {
+               if(Number(section.id) !== Number(sectionid)) return section;
+
+               return {
+                ...section,
+                subSection: (section.subSection || []).map( (sub) => {
+                    if(Number(sub.id) !== Number(subsectionid)) return sub;
+                    
+                    return response.data;
+                
+                })
+               }
+            })
+           }
+        })
+    });
+        
+    toast.success("Subsection updated successfully");
+    navigate(`/dashboard/sectioninfo/${courseid}`);
+  
   };
 
   return (

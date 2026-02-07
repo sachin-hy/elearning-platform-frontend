@@ -4,26 +4,25 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import {AiOutlineShoppingCart} from "react-icons/ai";
-import { Instructor } from "../../../../data/constData";
-import ProfileDropDown from "../../auth/ProfileDropDown";
+
 import { useEffect, useState } from "react";
-import { apiConnector } from "../../../../services/apiconnector";
-import { categories } from "../../../../services/apis";
+
 import {IoIosArrowDropdownCircle} from "react-icons/io";
 import {logout} from  "../../../../services/operations/authApi"
 import { useNavigate } from "react-router-dom";
-import { categorysEndpoints } from "../../../../services/apis";
+
 import { CircleUser } from 'lucide-react';
 import { fetchSubLinks } from "../../../../services/operations/categoryApi";
 import { ACCOUNT_TYPE } from "../../../../utils/constants";
+import toast from "react-hot-toast";
+
 
 function Navbar({menu,setMenu})
 {
 
     const {token} = useSelector( (state) => state.auth);
     const {user} = useSelector( (state) => state.profile);
-    const {studentCourses} = useSelector((state) => state.studentCourses);
-    
+   
 
 
     console.log("menu = " , menu);
@@ -32,14 +31,23 @@ function Navbar({menu,setMenu})
 
     const [subLinks,setSubLinks] = useState([]);
 
-    console.log("sublinks = " , subLinks);
-
-    
-
 
     useEffect(()=>{
-        fetchSubLinks(setSubLinks);
+
+        const loadSubLinks = async () => {
+        const result = await fetchSubLinks(setSubLinks);
         
+        if(result.success){
+            setSubLinks(result.data);
+        }else{
+            toast.error("Error while fetching sublinks: " + result.message);
+            setSubLinks([]);
+        }
+    }
+
+    loadSubLinks();
+
+
     },[]);
    
   
@@ -48,7 +56,7 @@ function Navbar({menu,setMenu})
     
     const matchRoute = (route) =>
     {
-        return matchPath({path:route},location.pathname)
+        return matchPath({path:route},location.pathname);
     }
 
    
@@ -61,10 +69,6 @@ function Navbar({menu,setMenu})
                 <Link to="/">
                   
                 </Link>
-
-               
-
-
 
                 {/**Navlinks  */}
                 <nav className="mx-auto">
@@ -126,11 +130,7 @@ function Navbar({menu,setMenu})
                         user && user?.accountType === ACCOUNT_TYPE.STUDENT && (
                             <Link to={`/catalog/${"cart"}`} >
                                 <AiOutlineShoppingCart className="w-6 h-6 text-white"/>
-                                {
-                                    studentCourses > 0 && (
-                                        <span>{studentCourses}</span>
-                                    )
-                                }
+                               
                             </Link>
                         )
                     }
@@ -153,9 +153,7 @@ function Navbar({menu,setMenu})
                         )
                     }
 
-                    {
-                        token != null && <ProfileDropDown />
-                    }
+                   
                     {
                         token != null && (<button className="border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-white rounded-md" onClick={()=>dispatch(logout(navigate))}> Logout</button>)
                     }

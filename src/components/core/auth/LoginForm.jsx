@@ -3,7 +3,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
 import { useDispatch } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
 import { login } from "../../../services/operations/authApi"
-
+import toast from "react-hot-toast";
 
 function LoginForm()
 {
@@ -34,13 +34,24 @@ function LoginForm()
     
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    
     setLoading(true);
+
+    
     console.log("loading value = " + loading);
     try {
-       await dispatch(login(email, password, navigate));
+       const result = await dispatch(login(email, password));
+       
+       if(!result.success)
+       {
+          toast.error("Login Failed: " + result.message);
+         return;
+       }
+
+       toast.success("Login Successful");
+       navigate("/dashboard/my-profile");
     } catch (error) {
         console.error("Login failed:", error);
+        toast.error("An unexpected error occurred. Please try again later.");
     } finally {
         setLoading(false); 
     }

@@ -1,25 +1,24 @@
-
-import {combineReducers} from "@reduxjs/toolkit";
+import { combineReducers } from "@reduxjs/toolkit";
 import authReducer from "../slices/authSlice";
 import profileReducer from "../slices/profileSlice";
-import cartReducer from "../slices/cartSlice";
-import courseReducer from "../slices/courseSlice"
-import studentCoursesReducer from "../slices/studentCoursesSlice";
-import instructorCoursesReducer from "../slices/instructorCoursesSlice";
-import roomReducer from "../slices/roomSlice";
 
+import { persistReducer } from "redux-persist";
+import { persistStore } from "redux-persist";
+import { configureStore } from "@reduxjs/toolkit";
+import {
+  authSlicePersistConfig,
+  profileSlicePersistConfig,
+} from "../store/persistConfig";
 
+const userId = localStorage.getItem("userId") || "default";
 
-const rootReducer = combineReducers(
-    {
-        auth: authReducer,
-        profile:profileReducer,
-        cart:cartReducer,
-        course:courseReducer,
-        studentCourses: studentCoursesReducer,
-        instructorCourses: instructorCoursesReducer,
-        room:roomReducer
-    }
-)
+const rootReducer = combineReducers({
+  auth: persistReducer(authSlicePersistConfig(userId), authReducer),
+  profile: persistReducer(profileSlicePersistConfig(userId), profileReducer),
+});
 
-export default rootReducer;
+export const store = configureStore({
+  reducer: rootReducer,
+});
+
+export const persistor = persistStore(store);

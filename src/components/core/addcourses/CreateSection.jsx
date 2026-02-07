@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { createSection } from "../../../services/operations/courseApi";
 import { useCourseContext } from "../../../providers/CourseProvider";
 import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+
 function CreateSection() {
 
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
-  const { courseid, setSectionid } = useCourseContext();
+  const { setCourses, courseid} = useCourseContext();
   const dispatch = useDispatch();
 
 
@@ -24,8 +26,28 @@ function CreateSection() {
       courseid: courseid,
     };
 
-    console.log("formData = " + formData);
-    await createSection(formData, navigate, token, setSectionid,dispatch,courseid);
+   
+    const result = await createSection(formData, token);
+    if(!result.success)
+    {
+      toast.error("Failed to create section: " + result.message);
+      return;
+    }
+     
+     setCourses( (prevCourses) => {
+        return prevCourses.map( (course) => {
+            if(Number(course.courseid) !== Number(courseid)) return course;
+
+            return {
+              ...course,
+              courseContent: [...(course.courseContent || []), result.data]
+            }
+        })
+     });
+     
+     toast.success("Section Created Successfully");
+     
+     navigate(`/dashboard/sectioninfo/${courseid}`);
   };
 
   return (

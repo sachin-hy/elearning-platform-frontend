@@ -50,7 +50,7 @@ function SignupForm()
         }
     );
 
-     
+  const [loading, setLoading] = useState(false);   
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -79,10 +79,10 @@ function SignupForm()
 
 
  
-   const handleOnSubmit = (e) => {
+   const handleOnSubmit = async(e) => {
       
       e.preventDefault()
-
+      
       if(password !== confirmPassword){
         toast.error("Password Do Not Match")
         return
@@ -98,16 +98,21 @@ function SignupForm()
       //to be used after otp verification
       dispatch(setSignupData(signupData))
       //send otp to user for verification
-      dispatch(sendOtp(formData.email,navigate))
-
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      })
-      setAccountType(ACCOUNT_TYPE.STUDENT)
+      setLoading(true);
+      const result = await dispatch(sendOtp(formData.email,navigate))
+ 
+      if(!result.success)
+      {
+        toast.error(result.message);
+        setLoading(false);
+        navigate("/signup");
+        return;
+      }
+       toast.success("OTP sent Successfully");
+       navigate("/verify-email");
+    
+    
+      return;
    }
 
 
@@ -216,9 +221,10 @@ function SignupForm()
 
         <button
           type="submit"
+          disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Create Account
+          {loading ? "Creating Account..." : "Create Account"}
         </button>
       </form>
     </div>

@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from "react-redux"
 import { ArrowLeft, Save, User, Mail, Phone, Calendar, Info } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { updateProfile } from "../../services/operations/profileApi"
+import toast from "react-hot-toast"
+
 
 function EditProfile() {
   const user = useSelector((state) => state.profile.user)
@@ -30,7 +32,7 @@ function EditProfile() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const updatedUser = {
       firstName: formData.firstName,
@@ -41,8 +43,16 @@ function EditProfile() {
       dob: formData.dob,
       about: formData.about,
     }
-    dispatch(updateProfile(updatedUser, token, navigate))
+    const response = await dispatch(updateProfile(updatedUser, token))
+    if (!response.success) {
+      toast.error("Failed to update profile: " + response.message)
+      return
+    }
+    toast.success("Profile updated successfully");
+    navigate("/dashboard/my-profile");
   }
+
+
 
   return (
     <div className="min-h-screen">
@@ -52,7 +62,7 @@ function EditProfile() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <button
-                onClick={() => navigate("/dashboard/profile")}
+                onClick={() => navigate("/dashboard/my-profile")}
                 className="mr-4 p-2 rounded-lg hover:bg-gray-200 text-white hover:text-gray-900 transition-colors duration-200"
               >
                 <ArrowLeft className="h-5 w-5 " />

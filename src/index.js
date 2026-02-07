@@ -1,37 +1,31 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { BrowserRouter } from 'react-router-dom';
-import {Provider} from "react-redux";
-import rootReducer from "./reducer"
-import {configureStore} from "@reduxjs/toolkit"
-import {Toaster} from "react-hot-toast";
-import { ThemeProvider } from '@material-tailwind/react';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
+import rootReducer from "./reducer";
+import { configureStore } from "@reduxjs/toolkit";
+import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "@material-tailwind/react";
+import { persistStore } from "redux-persist";
+import { store } from "./reducer";
+import { persistor } from "./reducer";
+import { PersistGate } from "redux-persist/integration/react";
 
-const store = configureStore(
-  {
-    reducer:rootReducer,
-  }
-);
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  
-    <Provider store={store}>
-    <BrowserRouter>
-     
-       <App />
-         <Toaster/>
-      
-     
-
-    </BrowserRouter>
-
-    </Provider>
-  
- 
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <ThemeProvider>
+          <App />
+          <Toaster />
+        </ThemeProvider>
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>,
 );
 
 // If you want to start measuring performance in your app, pass a function

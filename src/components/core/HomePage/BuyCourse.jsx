@@ -4,10 +4,38 @@ import { useEffect, useState } from "react";
 import Footer from "../HomePage/common/Footer";
 import CardRating from "../ratingandreview/CardRating";
 import { useSelector } from "react-redux";
+import { getCourseDetails } from "../../../services/operations/courseApi";
+import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { fetchCourseFun } from "../../../services/operations/courseApi";
+import { OrbitProgress } from "react-loading-indicators";
+
 
 function BuyCourse() {
-  const course = JSON.parse(localStorage.getItem("buycourse"));
-   
+  
+   const {courseid} = useParams();
+
+   const [course,setCourse] = useState(null);
+
+   useEffect( () => {
+      
+      const loadCourse = async () => {
+             
+         const result = await fetchCourseFun(courseid);
+
+         if(!result.success)
+         {
+           toast.error("Error while Fetching Course details : " + result.message);
+
+           return;
+         }
+
+         setCourse(result.data);
+      }
+
+      loadCourse();
+
+   },[courseid]);
 
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
 
@@ -27,9 +55,9 @@ function BuyCourse() {
  
   if (!course) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-100">
-        <p className="text-xl text-gray-700">Course not found. Please navigate from the courses page.</p>
-      </div>
+          <div className="flex justify-center  items-center min-h-screen">
+            <OrbitProgress variant="dotted" color="#dee7de" size="medium" text="" textColor="" />
+          </div>
     );
   }
 

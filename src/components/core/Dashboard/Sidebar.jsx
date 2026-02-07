@@ -4,21 +4,33 @@ import SidebarLinks from "./SidebarLinks";
 import { useNavigate } from "react-router-dom";
 import { VscSignOut } from "react-icons/vsc";
 import { logout } from "../../../services/operations/authApi";
-
+import toast from "react-hot-toast";
 
 function Sidebar()
 {
+   
     const {user} = useSelector((state)=>state.profile);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    console.log("sidebar length = " + sidebarLinks.length);
-    function onClickHandler()
+   
+    const onClickHandler = async () => {
     {
-        dispatch(logout(navigate));
-    }
+       const result = await dispatch(logout(navigate));
 
+      if(!result.success)
+      {
+        toast.error("Logout failed: " + result.message);
+        return;
+      }
+      
+       toast.success("Logout successful");
+       navigate("/");
+    }
+  }
+
+    
    return(
     <div className="flex flex-col text-white   font-normal py-10">
     
@@ -42,7 +54,6 @@ function Sidebar()
      />
 
      <button
-     
      onClick={onClickHandler}
      >
         <div className="flex text-white ml-8 items-center gap-x-2">
@@ -57,5 +68,6 @@ function Sidebar()
    ) 
 
 }
+
 
 export default Sidebar;
